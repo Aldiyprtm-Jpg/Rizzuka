@@ -443,19 +443,6 @@
     <!-- End Main Content -->
 
     <!-- Begin Footer -->
-    <div class="footer">
-      <div class="container">
-        <a href="https://github.com/daengdoang/simple-wedding-invitation" class="has-vertically-align">
-          <p class="has-vertically-align">2020 &copy @daengdoang </p>
-        </a>
-        <a href="https://bulma.io" class="has-vertically-align">
-          <img src="https://bulma.io/images/made-with-bulma.png" alt="Made with Bulma">
-        </a>
-        <a href="https://www.netlify.com">
-          <img src="https://www.netlify.com/img/global/badges/netlify-color-bg.svg" alt="Deploy with Netlify"/>
-        </a>
-      </div>
-    </div>
     <!-- End Footer -->
 
     <!-- Scripts -->
@@ -468,6 +455,81 @@
         easing: "ease-out",
         duration: 800,
       });
+    </script>
+
+    <!-- Background audio + interactive play/pause button -->
+    <audio id="bg-audio" src="music/bofm.wav" loop preload="auto" playsinline></audio>
+
+    <style>
+      /* Tombol audio kecil di pojok bawah-kanan */
+      #audio-toggle{
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(188,136,135,0.95);
+        color: #fff;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 9999;
+      }
+      #audio-toggle:focus{ outline: 2px solid rgba(255,255,255,0.2); }
+      /* SVG icon sizing */
+      #audio-toggle svg{ width: 20px; height: 20px; display: block; fill: #fff; }
+    </style>
+
+    <!-- Tombol sekarang memakai SVG logo (play/pause) -->
+    <button id="audio-toggle" aria-pressed="false" aria-label="Play background music" title="Play / Pause music">
+      <!-- default content will be set by JS -->
+    </button>
+
+    <script>
+      (function(){
+        var audio = document.getElementById('bg-audio');
+        var btn = document.getElementById('audio-toggle');
+        if (!audio || !btn) return;
+
+        var playSvg = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg>';
+        var pauseSvg = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 19h4V5H6v14zM14 5v14h4V5h-4z"/></svg>';
+
+        function updateButton(){
+          if (audio.paused){
+            btn.setAttribute('aria-pressed', 'false');
+            btn.innerHTML = playSvg;
+            btn.setAttribute('aria-label', 'Play background music');
+          } else {
+            btn.setAttribute('aria-pressed', 'true');
+            btn.innerHTML = pauseSvg;
+            btn.setAttribute('aria-label', 'Pause background music');
+          }
+        }
+
+        // Toggle on click
+        btn.addEventListener('click', function(){
+          if (audio.paused){
+            audio.play().then(updateButton).catch(function(){ /* autoplay blocked */ updateButton(); });
+          } else {
+            audio.pause();
+            updateButton();
+          }
+        });
+
+        // Try autoplay; if blocked, button will allow user to start
+        audio.play().then(updateButton).catch(function(){
+          updateButton();
+        });
+
+        // Pause audio when page hidden to save resources
+        document.addEventListener('visibilitychange', function(){
+          if (document.hidden){ audio.pause(); updateButton(); }
+        });
+      })();
     </script>
   </body>
 </html>
